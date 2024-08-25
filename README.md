@@ -10,7 +10,7 @@ This repository contains the source code and configuration files for the `yuvald
 
 Below is a high-level overview of the architecture of this application:
 
-![Architecture Diagram](path/to/architecture-diagram.png)
+![Architecture Diagram](images/architecture.jpeg)
 
 ### Components
 
@@ -22,10 +22,10 @@ Below is a high-level overview of the architecture of this application:
 
 ## Prerequisites
 
-Before setting up this application, ensure you have the following installed:
+Before setting up this application, ensure you can use:
 
 - Docker
-- Kubernetes (k3s, EKS, or any other distribution)
+- Kubernetes (EKS)
 - Helm
 - Terraform
 - Git
