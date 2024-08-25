@@ -4,7 +4,7 @@
 
 ## Overview
 
-This repository contains the source code and configuration files for the `yuvaldevops` DevOps application. This application is designed to streamline and automate various DevOps tasks, including CI/CD pipelines, infrastructure provisioning, monitoring, and logging.
+This repository contains the source code and configuration files for the `Todo` DevOps application. This application is designed to streamline and provide source for DevOps full pipeline. including CI/CD pipelines, infrastructure provisioning, monitoring, and logging.
 
 ## Architecture
 
