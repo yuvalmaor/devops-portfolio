@@ -1,0 +1,237 @@
+
+
+pipeline {
+    agent any
+
+        
+   
+    environment {
+        
+        ECR = "644435390668.dkr.ecr.ap-south-1.amazonaws.com/yuval-todo"
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+
+    stages {
+        //this is stage to test git connection
+        stage('test git fetch tags') {
+            steps {
+                // Using SSH agent to manage credentials
+                sshagent(credentials: ['9a72dfb7-2924-4fdc-8a10-3888eee4206f']) {
+                    // Fetch all tags from the remote repository
+                    sh 'git fetch --tags'
+
+                    // Print all tags
+                    sh 'git tag -l | xargs -I {} echo "Tag: {}"'
+                }
+            }
+        }
+        //package code (do also previos stages) 
+        stage('build') { 
+            when {
+                anyOf {
+                    branch "feature/*"
+                    branch "main"
+                    
+                }
+            }
+            steps {
+                script {
+                        
+                    echo 'build' 
+                    
+                    
+                    sh "./scripts/build.sh" //
+                } 
+              
+            }
+        }
+        //package code (do also previos stages)
+        stage('unit-test') { 
+            when {
+                anyOf {
+                    branch "feature/*"
+                    branch "main"
+                    
+                }
+            }
+            steps {
+                script {
+                        
+                    echo ' unit tests' 
+                    
+                    
+                    sh "./scripts/unittest.sh"
+                } 
+              
+            }
+        }
+        //package code (do also previos stages)
+        stage('package') { 
+            when {
+                anyOf {
+                    branch "feature/*"
+                    branch "main"
+                    
+                }
+            }
+            steps {
+                configFileProvider(
+                    [configFile(fileId: '511c9c12-0c4c-477a-9565-f0cf8f76a84c', variable: 'MAVEN_SETTINGS')]) {   
+                        echo 'package its include also previos steps like build/compile and unit tests' 
+                      
+                        sh "docker compose down --rmi all | true" 
+                        sh "docker build -t todo ." 
+                    } 
+              
+            }
+        }
+
+        //e2e for main branch
+        stage('main and feature/* e2e)') { 
+            when {
+                anyOf {
+                    branch "main"
+                    branch "feature/*"
+                }
+            }
+            steps {
+                script {
+           
+                
+                echo "Run E2E"  
+                withCredentials([file(credentialsId: 'c4fa5465-8ffa-4745-a122-4b67b3673cf3', variable: 'MY_SECRET_FILE')]) {
+                    sh 'cat $MY_SECRET_FILE > .env'
+                }
+                sh "ls -la"
+                sh "docker build -t costumnginx -f nginx/Dockerfilenginx ." 
+                sh "./scripts/e2e.sh 15.207.155.57" //127.0.0.1         
+                  
+                }
+            }
+        }
+        stage('Login to AWS ECR') {
+            when { anyOf { branch 'main' } }
+            steps {
+                script {
+                    // Login to ECR 
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'bed69ff4-d27a-42dc-9027-604617048566']]) {
+                        sh 'aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR'
+                    }
+                }
+            }
+        }
+
+        //get version from git tags
+        stage('calc version') {
+             when {
+                anyOf {
+                    branch "main"
+                }
+                
+            }
+            steps {
+                script {
+                    // calc version TODO replace with sh file
+                    sshagent(credentials: ['9a72dfb7-2924-4fdc-8a10-3888eee4206f']) {
+                        sh 'git fetch --tags'
+                    }
+                   
+                    def v=env.BRANCH_NAME -'release/'
+                    env.VSTART = v
+                    sh "echo 'branch number= ${v}'"
+                    def gitTags = sh(script: "git tag -l '1.1.*' | sort -V | tail -n 1", returnStdout: true).trim()
+                    def oldpatch= ""
+                    def oldpatchnum= ""
+                    def newpatchnum = ""
+                    def num =""
+                   
+                    if (gitTags == "") {
+
+                        env.MYNEWVERSION ="1.1.1"
+                    }
+                    else
+                    {
+                       
+                        oldpatch= gitTags
+                        
+                        oldpatchnum= gitTags - "1.1."  
+                        newpatchnum = "${oldpatchnum.toInteger()+1}"
+                     
+                        num ="1.1.${newpatchnum}"
+                        env.MYNEWVERSION ="${num}"
+
+                    }
+               
+                    
+                    
+                }
+            }
+        }
+        stage('Push Image Publish') {
+            when { anyOf { branch 'main' } }
+            steps {
+                script {
+                    // Push the built image to your Docker registry
+                    sh "docker tag todo todo:${env.MYNEWVERSION}"
+                    sh "docker tag  todo:${env.MYNEWVERSION} ${ECR}:${env.MYNEWVERSION}"
+                    sh "docker push ${ECR}:${env.MYNEWVERSION}"
+                }
+            }
+        }
+        
+        //add tag version to git 
+        stage('Tagging') {
+            when { branch 'main'}
+            steps {
+                script {
+                    sshagent(credentials: ['9a72dfb7-2924-4fdc-8a10-3888eee4206f']) { 
+                        sh 'git clean -f'
+                        sh "git tag ${env.MYNEWVERSION}" 
+                        sh "git push origin --tags"   
+                    }
+                }
+            }
+        }
+
+                //add tag version to git 
+        stage('Tagging gitops') {
+            when { branch 'main'}
+            steps {
+                script {
+                    
+                    sshagent(credentials: ['f527fb5f-9411-4228-b3a9-606cf86c17b4']) {
+                        sh """
+                        rm -r todo-gitops | true
+                        """
+                        sh """git clone git@gitlab.com:yuval8004314/todo-gitops.git""" 
+                        
+                        sh '''
+                            
+                            
+                            ./scripts/update_app_version.sh todo-gitops/infra/demo-todo/Chart.yaml '''+env.MYNEWVERSION+'''
+                            cd todo-gitops
+                            
+                        
+                            git config  user.email "yuvalmaor305@gmail.com"
+                            git config  user.name "YuvalMaor"
+                            git commit -am "Pipeline Update to version '''+env.MYNEWVERSION+'''"
+                            git push  
+                            
+                        '''                 
+                }
+                   
+            }
+        }
+        }
+//******
+
+    }
+        post {
+        always {
+            script {
+                // Clean the workspace after the build steps are completed
+                cleanWs()
+            }
+        }
+        }
+}

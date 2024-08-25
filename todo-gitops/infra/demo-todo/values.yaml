@@ -1,0 +1,104 @@
+deployment:
+  name: demo-todo-deployment
+  appName: demo-todo-pod
+  containerName: demo-todo-container
+  env:
+    - name: MONGODB_URI
+      valueFrom:
+        secretKeyRef:
+          name: demo-todo-secret
+          key: MONGODB_URI
+
+image:
+  name: 644435390668.dkr.ecr.ap-south-1.amazonaws.com/yuval-todo
+  tag: "" 
+  # 1.13
+
+configmap:
+  name: demo-todo-conf
+
+service:
+  name: demo-todo-svc
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+#
+ingress:
+  name: demo-todo-ingress
+  host: yuvaltodo.duckdns.org
+  tlsSecret: demo-todo.ddns.net-tls
+
+clusterissuer:
+  name: letsencrypt-prod
+  email: yuvalmaor305@gmail.com
+  server: https://acme-v02.api.letsencrypt.org/directory
+  privateKeySecretRef:
+    name: demo-todo.ddns.net-tls
+  ingressClass:
+    name: nginx
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "64Mi"
+  limits:
+    cpu: "200m"
+    memory: "128Mi"
+
+mongodb:
+  architecture: replicaset
+  replicaCount: 3
+  arbiter:
+    enabled: false
+  persistence:
+    enabled: true
+    size: "8Gi"
+    storageClass: ""
+    accessModes:
+      - ReadWriteOnce
+  # auth:
+  #   existingSecret: demo-todo-mongodb-secret
+  auth:
+    enabled: true
+    rootPassword: "root"
+    rootUser: "root"
+ #   existingSecret: demo-todo-mongodb-secret
+  nameOverride: mongodb
+  service:
+    name: mongodb-headless
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "64Mi"
+    limits:
+      cpu: "200m"
+      memory: "250Mi"
+  readinessProbe:
+    enabled: false
+  livenessProbe:
+    enabled: false
+
+secret:
+  name: "demo-todo-secret"
+s3:
+  bucket: "yuval-static"
+  region: "ap-south-1"
+
+# cronjob:
+#   enabled: true
+#   schedule: "0 0 * * *"
+#   jobName: "purge-mongodb-users"
+#   image:
+#     repository: bitnami/mongodb
+#     tag: latest
+#   resources:
+#     requests:
+#       cpu: "100m"
+#       memory: "128Mi"
+#     limits:
+#       cpu: "200m"
+#       memory: "256Mi"
+#   mongodb:
+#     secretName: "demo-todo-secret"
+#     secretKey: "MONGODB_URI"
+#     db: "test"

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: demo-todo
+  namespace: argo
+spec:
+  project: default
+  source:
+    repoURL: 'git@gitlab.com:yuval8004314/todo-gitops.git'
+    path: infra/demo-todo
+    targetRevision: HEAD
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: todo-app
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

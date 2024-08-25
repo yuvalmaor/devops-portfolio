@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argo
+spec:
+  project: default
+  source:
+    repoURL: 'https://prometheus-community.github.io/helm-charts'
+    chart: kube-prometheus-stack
+    targetRevision: 58.6.0
+    helm:
+      parameters:
+        - name: installCRDs
+          value: 'true' 
+      
+      values: |
+        prometheus:
+          prometheusSpec:
+            additionalScrapeConfigs:
+              - job_name: expense-tracker
+                honor_labels: true
+                scrape_interval: 1m
+                scrape_timeout: 30s
+                metrics_path: /metrics
+                scheme: http
+                static_configs:
+                  - targets:
+                      - yuvaltodo.duckdns.org
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: prometheus-grafana-stack
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

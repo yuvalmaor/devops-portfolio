@@ -1,0 +1,55 @@
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: {{ .Values.ingress.name }}
+#   annotations:
+#     cert-manager.io/cluster-issuer: {{ .Values.clusterissuer.name }}
+# #    nginx.ingress.kubernetes.io/rewrite-target: /$1
+# #    nginx.ingress.kubernetes.io/use-regex: "true"
+# #    nginx.ingress.kubernetes.io/configuration-snippet: |
+# #      proxy_set_header Host {{ .Values.s3.bucket }}.s3.{{ .Values.s3.region }}.amazonaws.com;
+# #      proxy_pass https://{{ .Values.s3.bucket }}.s3.{{ .Values.s3.region }}.amazonaws.com$request_uri;
+# spec:
+#   ingressClassName: {{ .Values.clusterissuer.ingressClass.name }}
+#   tls:
+#     - hosts:
+#         - {{ .Values.ingress.host }}
+#       secretName: {{ .Values.ingress.tlsSecret }}
+#   rules:
+#     - host: {{ .Values.ingress.host }}
+#       http:
+#         paths:
+#           - path: /(.*)
+#             pathType: ImplementationSpecific
+#             backend:
+#               service:
+#                 name: {{ .Values.service.name }}
+#                 port:
+#                   number: {{ .Values.service.port }}
+
+
+
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.ingress.name }}
+  annotations:
+    cert-manager.io/cluster-issuer: {{ .Values.clusterissuer.name }}
+spec:
+  ingressClassName: {{ .Values.clusterissuer.ingressClass.name }}
+  tls:
+    - hosts:
+        - {{ .Values.ingress.host }}
+      secretName: {{ .Values.ingress.tlsSecret }}
+  rules:
+    - host: {{ .Values.ingress.host }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.service.name }}
+                port:
+                  number: {{ .Values.service.port }}

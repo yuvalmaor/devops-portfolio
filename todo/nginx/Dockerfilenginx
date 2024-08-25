@@ -1,0 +1,15 @@
+# Use the specific version of nginx based on alpine slim
+FROM nginx:1.25.5
+
+# Copy the nginx configuration file from your local path into the container
+COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
+# Copy the nginx configuration file from your local path into the container
+COPY ./nginx/nginx.conf /yuval/nginx/nginx.conf
+# Copy the static files from your local static directory into the appropriate path in the container
+COPY ./static /usr/share/nginx/html/static
+
+
+# Verify the copied files
+RUN ls -l /etc/nginx/nginx.conf && ls -l /usr/share/nginx/html/static
+
+CMD ["nginx", "-g", "daemon off;"]

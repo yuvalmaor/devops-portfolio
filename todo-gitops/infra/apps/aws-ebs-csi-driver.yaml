@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-ebs-csi-driver
+  namespace: argo
+spec:
+  project: default
+  source:
+    repoURL: 'https://kubernetes-sigs.github.io/aws-ebs-csi-driver'
+    chart: aws-ebs-csi-driver
+    targetRevision: 2.31.0 # Use the appropriate version of the chart
+    helm:
+      parameters: []
+ 
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true

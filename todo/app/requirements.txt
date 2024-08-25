@@ -1,0 +1,5 @@
+flask
+flask-restful
+pymongo
+prometheus_flask_exporter
+pytest
