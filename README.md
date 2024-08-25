@@ -1,6 +1,6 @@
 # DevOps Application
 
-![Logo](images/todo.webp) <!-- Optional: Add your application logo -->
+<img src="images/todo.webp" alt="Logo" width="200"/>
 
 ## Overview
 
