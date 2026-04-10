@@ -1,0 +1,30 @@
+---
+const lines = [
+  '$ kubectl get pods -n production',
+  'api-7d8fc8f76f-r4k2n  1/1 Running 0  12d',
+  'worker-67b6d7484f-g2j5q 1/1 Running 0  12d',
+  '$ terraform plan',
+  'Plan: 2 to add, 0 to change, 0 to destroy.',
+  '$ aws s3 sync dist/ s3://my-portfolio --delete',
+  'upload: dist/index.html to s3://my-portfolio/index.html',
+  'Done. 🚀'
+];
+---
+
+<section class="panel cli-panel">
+  <header class="panel-header">
+    <span class="dot red"></span>
+    <span class="dot yellow"></span>
+    <span class="dot green"></span>
+    <p>ship-log@orbit-terminal</p>
+  </header>
+  <div class="terminal-window" aria-label="Animated fake DevOps CLI">
+    {
+      lines.map((line, idx) => (
+        <p style={`--delay: ${idx * 0.7}s`} class="terminal-line">
+          {line}
+        </p>
+      ))
+    }
+  </div>
+</section>

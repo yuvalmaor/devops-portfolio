@@ -1,38 +1,33 @@
-# DevOps Application
+# DevOps Space Portfolio (Astro)
 
-<img src="images/todo.webp" alt="Logo" width="200"/>
+A futuristic, space-themed DevOps portfolio built with [Astro](https://astro.build/) and optimized for static hosting on Amazon S3.
 
-## Overview
+## Features
 
-This repository contains the source code and configuration files for the `Todo` DevOps application. This application is designed to streamline and provide source for DevOps full pipeline. including CI/CD pipelines, infrastructure provisioning, monitoring, and logging.
+- Space-themed visual interface (stars, nebula, glassmorphism panels)
+- Fake animated DevOps CLI terminal
+- Responsive sections for skills, mission control, and project timeline
+- Static site output suitable for S3 website hosting
 
-## Architecture
+## Quick Start
 
-Below is a high-level overview of the architecture of this application:
+```bash
+npm install
+npm run dev
+```
 
-![Architecture Diagram](images/architecture.jpeg)
+## Build for S3
 
-### Components
+```bash
+npm run build
+```
 
-1. **CI/CD Pipeline**: Automates the process of code integration and deployment.
-2. **Infrastructure as Code (IaC)**: Manages infrastructure using Terraform, Kubernetes manifests, and Helm charts.
-3. **Monitoring and Logging**: Uses Prometheus, Grafana, and Loki to monitor and log application and infrastructure performance.
-4. **Container Orchestration**: Kubernetes is used to manage containerized applications.
-5. **Secret Management**: Securely manages secrets using HashiCorp Vault.
+Generated static files are in `dist/`.
 
-## Prerequisites
+## Deploy to S3
 
-Before setting up this application, ensure you can use:
+```bash
+aws s3 sync dist/ s3://YOUR_BUCKET_NAME --delete
+```
 
-- Docker
-- Kubernetes (EKS)
-- Helm
-- Terraform
-- Git
-
-## Setup
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/yuvaldevops.git
-   cd yuvaldevops
+If you're using S3 static website hosting, configure the bucket website endpoint and set `index.html` as both index and error document.

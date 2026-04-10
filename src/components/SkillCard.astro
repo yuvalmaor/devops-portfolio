@@ -1,0 +1,15 @@
+---
+interface Props {
+  title: string;
+  text: string;
+  metric: string;
+}
+
+const { title, text, metric } = Astro.props;
+---
+
+<article class="panel skill-card">
+  <p class="metric">{metric}</p>
+  <h3>{title}</h3>
+  <p>{text}</p>
+</article>

@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import FakeCli from '../components/FakeCli.astro';
+import SkillCard from '../components/SkillCard.astro';
+
+const skills = [
+  {
+    title: 'Cloud Infrastructure',
+    text: 'Designing secure AWS foundations with Terraform, IAM boundaries, and cost-aware architectures.',
+    metric: '99.99% Uptime'
+  },
+  {
+    title: 'Kubernetes + GitOps',
+    text: 'Shipping workloads using Helm + ArgoCD with repeatable, policy-driven deployments.',
+    metric: '250+ Deploys/Month'
+  },
+  {
+    title: 'Observability',
+    text: 'Building dashboards and alerts with Prometheus, Loki, and Grafana to reduce MTTR fast.',
+    metric: 'MTTR -63%'
+  },
+  {
+    title: 'CI/CD Automation',
+    text: 'Automating test/build/release pipelines so every commit can become production-ready.',
+    metric: 'Lead Time < 1h'
+  }
+];
+---
+
+<BaseLayout
+  title="DevOps Commander | Space Portfolio"
+  description="A futuristic, space-themed DevOps portfolio built with Astro and ready for S3 hosting."
+>
+  <section class="hero panel">
+    <p class="tag">🛰️ ORBITAL DEVOPS PORTFOLIO</p>
+    <h1>Hey, I build cloud systems that scale like galaxies.</h1>
+    <p>
+      I turn infrastructure chaos into reliable delivery pipelines using AWS, Kubernetes, Terraform,
+      and observability-first engineering.
+    </p>
+    <div class="cta-group">
+      <a href="#mission-control" class="btn primary">Open Mission Control</a>
+      <a href="#flight-log" class="btn">View Flight Log</a>
+    </div>
+  </section>
+
+  <section id="mission-control" class="grid two-up">
+    <div class="panel radar">
+      <h2>Mission Control</h2>
+      <p>Core command systems I operate daily.</p>
+      <ul>
+        <li>AWS (EKS, ECS, Lambda, S3, CloudFront)</li>
+        <li>Kubernetes + Helm + ArgoCD</li>
+        <li>Terraform + Terragrunt</li>
+        <li>Jenkins + GitHub Actions</li>
+        <li>Prometheus + Grafana + Loki</li>
+      </ul>
+    </div>
+    <FakeCli />
+  </section>
+
+  <section class="grid cards">
+    {skills.map((skill) => <SkillCard {...skill} />)}
+  </section>
+
+  <section id="flight-log" class="panel timeline">
+    <h2>Flight Log Highlights</h2>
+    <div class="timeline-item">
+      <p class="year">2026</p>
+      <div>
+        <h3>Multi-region deployment architecture</h3>
+        <p>Implemented active/passive failover strategy with infrastructure as code and SLO guardrails.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <p class="year">2025</p>
+      <div>
+        <h3>Kubernetes platform modernization</h3>
+        <p>Migrated legacy apps to EKS + GitOps, reducing deployment friction and downtime windows.</p>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <p class="year">2024</p>
+      <div>
+        <h3>Observability reboot</h3>
+        <p>Unified metrics, logs, and alerting to shorten incident detection and response cycles.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="panel footer">
+    <p>Built with Astro. Optimized for static hosting on Amazon S3.</p>
+    <p>Contact: devops.command@orbit.example</p>
+  </footer>
+</BaseLayout>
